@@ -261,10 +261,10 @@ class DishCommon:
         if opts.satus_mode:
             timestamp = int(time.time())
             try:
-                groups = self.starlink_grpc.status_data(
+                groups = starlink_grpc.status_data(
                     context=gstate.context)
                 status_data, obstruct_detail, alert_detail = groups[0:3]
-            except self.starlink_grpc.GrpcError as e:
+            except starlink_grpc.GrpcError as e:
                 if "status" in opts.mode:
                     if opts.need_id and gstate.dish_id is None:
                         self.conn_error(
@@ -289,9 +289,9 @@ class DishCommon:
             return 0, timestamp
         elif opts.need_id and gstate.dish_id is None:
             try:
-                gstate.dish_id = self.starlink_grpc.get_id(
+                gstate.dish_id = starlink_grpc.get_id(
                     context=gstate.context)
-            except self.starlink_grpc.GrpcError as e:
+            except starlink_grpc.GrpcError as e:
                 self.conn_error(opts, "Failure getting dish ID: %s", str(e))
                 return 1, None
             if opts.verbose:
@@ -306,12 +306,12 @@ class DishCommon:
         else:
             try:
                 timestamp = int(time.time())
-                history = self.starlink_grpc.get_history(
+                history = starlink_grpc.get_history(
                     context=gstate.context)
                 gstate.timestamp_stats = timestamp
             except grpc.RpcError as e:
                 self.conn_error(opts, "Failure getting history: %s",
-                                str(self.starlink_grpc.GrpcError(e)))
+                                str(starlink_grpc.GrpcError(e)))
                 history = None
 
         parse_samples = opts.samples if gstate.counter_stats is None else -1
@@ -321,11 +321,11 @@ class DishCommon:
         # was a dish reboot.
         if gstate.accum_history:
             if history is not None:
-                gstate.accum_history = self.starlink_grpc.concatenate_history(gstate.accum_history,
-                                                                              history,
-                                                                              samples1=parse_samples,
-                                                                              start1=start,
-                                                                              verbose=opts.verbose)
+                gstate.accum_history = starlink_grpc.concatenate_history(gstate.accum_history,
+                                                                         history,
+                                                                         samples1=parse_samples,
+                                                                         start1=start,
+                                                                         verbose=opts.verbose)
                 # Counter tracking gets too complicated to handle across reboots
                 # once the data has been accumulated, so just have concatenate
                 # handle it on the first polled loop and use a value of 0 to
@@ -359,10 +359,10 @@ class DishCommon:
         if gstate.accum_history is None:
             return (0, None) if flush_history else (1, None)
 
-        groups = self.starlink_grpc.history_stats(parse_samples,
-                                                  start=start,
-                                                  verbose=opts.verbose,
-                                                  history=gstate.accum_history)
+        groups = starlink_grpc.history_stats(parse_samples,
+                                             start=start,
+                                             verbose=opts.verbose,
+                                             history=gstate.accum_history)
         general, ping, runlen, latency, loaded, usage = groups[0:6]
         add_data = self.add_data_numeric if opts.numeric else self.add_data_normal
         add_data(general, "ping_stats", add_item, add_sequence)
@@ -392,11 +392,11 @@ class DishCommon:
         start = gstate.counter
         parse_samples = opts.bulk_samples if start is None else -1
         try:
-            general, bulk = self.starlink_grpc.history_bulk_data(parse_samples,
-                                                                 start=start,
-                                                                 verbose=opts.verbose,
-                                                                 context=gstate.context)
-        except self.starlink_grpc.GrpcError as e:
+            general, bulk = starlink_grpc.history_bulk_data(parse_samples,
+                                                            start=start,
+                                                            verbose=opts.verbose,
+                                                            context=gstate.context)
+        except starlink_grpc.GrpcError as e:
             self.conn_error(opts, "Failure getting history: %s", str(e))
             return 1
 
