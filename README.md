@@ -39,3 +39,6 @@ Click add, confirm you want to install
 ## Future
 
 Add services to be able to restart and stow the dish. The script is written, it will just need to me ported to work for HA
+
+## Thanks
+A large thanks to Sparky8512 for providing the kick start to all of this, this uses modified versions of scripts from https://github.com/sparky8512/starlink-grpc-tools
