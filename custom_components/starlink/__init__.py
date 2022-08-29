@@ -27,7 +27,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Starlink from a config entry."""
-    polling_interval = 10
+    polling_interval = 1
     api = StarlinkClass()
 
     try:

@@ -19,7 +19,7 @@ import sys
 import time
 
 from .dish_common import DishCommon
-from .starlink_grpc import StarlinkGrpc
+import starlink_grpc
 
 
 class DishGrpcText:
@@ -27,7 +27,6 @@ class DishGrpcText:
     def __init__(self):
         pass
 
-    _starlink_grpc = StarlinkGrpc()
     _dish_common = DishCommon()
     COUNTER_FIELD = "end_counter"
     VERBOSE_FIELD_MAP = {
@@ -134,11 +133,11 @@ class DishGrpcText:
                     header.append(name)
 
         if opts.satus_mode:
-            context = self._starlink_grpc.ChannelContext(target=opts.target)
+            context = self.starlink_grpc.ChannelContext(target=opts.target)
             try:
-                name_groups = self._starlink_grpc.status_field_names(
+                name_groups = self.starlink_grpc.status_field_names(
                     context=context)
-            except self._starlink_grpc.GrpcError as e:
+            except self.starlink_grpc.GrpcError as e:
                 self._dish_common.conn_error(
                     opts, "Failure reflecting status field names: %s", str(e))
                 return 1
@@ -150,11 +149,11 @@ class DishGrpcText:
                 header_add(name_groups[2])
 
         if opts.bulk_mode:
-            general, bulk = self._starlink_grpc.history_bulk_field_names()
+            general, bulk = self.starlink_grpc.history_bulk_field_names()
             header_add(bulk)
 
         if opts.history_stats_mode:
-            groups = self._starlink_grpc.history_stats_field_names()
+            groups = self.starlink_grpc.history_stats_field_names()
             general, ping, runlen, latency, loaded, usage = groups[0:6]
             header_add(general)
             if "ping_drop" in opts.mode:

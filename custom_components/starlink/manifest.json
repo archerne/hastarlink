@@ -6,7 +6,8 @@
   "requirements": [
     "grpcio>=1.12.0",
     "protobuf>=3.6.0",
-    "pypng>=0.0.20"
+    "pypng>=0.0.20",
+    "starlink-grpc-core>=1.0.2"
   ],
   "ssdp": [],
   "zeroconf": [],
