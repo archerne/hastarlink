@@ -1,0 +1,20 @@
+{
+  "domain": "starlink",
+  "name": "Starlink Statistics and Alerts",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/starlink",
+  "requirements": [
+    "grpcio>=1.12.0",
+    "protobuf>=3.6.0",
+    "pypng>=0.0.20"
+  ],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": [
+    "@archerne"
+  ],
+  "version": "0.0.1",
+  "iot_class": "local_polling"
+}

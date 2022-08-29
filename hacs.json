@@ -1,0 +1,12 @@
+{
+    "name": "Starlink Statistics and Alerts",
+    "country": "US",
+    "domains": [
+        "binary_sensor",
+        "sensor"
+    ],
+    "homeassistant": "0.115.0",
+    "iot_class": [
+        "Cloud Polling"
+    ]
+}
