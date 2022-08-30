@@ -189,20 +189,21 @@ class StarlinkSensor(CoordinatorEntity):
             self._state = coordinator_data["state"]
 
         elif self._kind == "starlink_downlink_throughput_mbps":
-            self._state = round((
-                float(coordinator_data["downlink_throughput_bps"])/1000000), 2)
+            self._state = round(
+                (float(coordinator_data["downlink_throughput_bps"])/1000000), 2)
             self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
 
         elif self._kind == "starlink_uplink_throughput_mbps":
-            self._state = round((
-                float(coordinator_data["uplink_throughput_bps"])/1000000), 2)
+            self._state = round(
+                (float(coordinator_data["uplink_throughput_bps"])/1000000), 2)
             self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
         elif self._kind == "starlink_pop_ping_drop_rate":
             self._state = round(
                 (float(coordinator_data["pop_ping_drop_rate"])*100), 2)
             self._unit_of_measure = PERCENTAGE
         elif self._kind == "starlink_pop_ping_latency_ms":
-            self._state = round(float(coordinator_data["pop_ping_latency_ms"]))
+            self._state = round(
+                float(coordinator_data["pop_ping_latency_ms"]), 2)
             self._unit_of_measure = TIME_MILLISECONDS
         elif self._kind == "starlink_uptime":
             self._state = int(coordinator_data["uptime"])
