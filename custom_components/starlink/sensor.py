@@ -189,8 +189,8 @@ class StarlinkSensor(CoordinatorEntity):
             self._state = coordinator_data["state"]
 
         elif self._kind == "starlink_downlink_throughput_mbps":
-            self._state = (
-                round(float(coordinator_data["downlink_throughput_bps"])/1000000), 2)
+            self._state = round((
+                float(coordinator_data["downlink_throughput_bps"])/1000000), 2)
             self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
 
         elif self._kind == "starlink_uplink_throughput_mbps":
