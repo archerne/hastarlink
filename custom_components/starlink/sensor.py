@@ -6,7 +6,7 @@ import datetime
 
 from homeassistant.util.dt import as_local, utc_from_timestamp
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, DEVICE_CLASS_TIMESTAMP
-from homeassistant.const import DATA_RATE_BITS_PER_SECOND, PERCENTAGE, TIME_MILLISECONDS, TIME_SECONDS, ATTR_NAME
+from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TIME_MILLISECONDS, TIME_SECONDS, ATTR_NAME
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -70,7 +70,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         StarlinkSensor(
             coordinator,
             "Downlink Throughput",
-            "starlink_downlink_throughput_bps",
+            "starlink_downlink_throughput_mbps",
             "mdi:information-outline",
             "starlinkstats",
         )
@@ -80,7 +80,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         StarlinkSensor(
             coordinator,
             "Uplink Throughput",
-            "starlink_uplink_throughput_bps",
+            "starlink_uplink_throughput_mbps",
             "mdi:information-outline",
             "starlinkstats",
         )
@@ -122,11 +122,11 @@ class StarlinkSensor(CoordinatorEntity):
         self._unit_of_measure = None
         self.attrs = {}
 
-        if self._kind == "starlink_downlink_throughput_bps":
-            self._unit_of_measure = DATA_RATE_BITS_PER_SECOND
+        if self._kind == "starlink_downlink_throughput_mbps":
+            self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
 
-        elif self._kind == "starlink_uplink_throughput_bps":
-            self._unit_of_measure = DATA_RATE_BITS_PER_SECOND
+        elif self._kind == "starlink_uplink_throughput_mbps":
+            self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
 
         elif self._kind == "starlink_pop_ping_drop_rate":
             self._unit_of_measure = PERCENTAGE
@@ -188,18 +188,21 @@ class StarlinkSensor(CoordinatorEntity):
         elif self._kind == "starlink_state":
             self._state = coordinator_data["state"]
 
-        elif self._kind == "starlink_downlink_throughput_bps":
-            self._state = float(coordinator_data["downlink_throughput_bps"])
-            self._unit_of_measure = DATA_RATE_BITS_PER_SECOND
+        elif self._kind == "starlink_downlink_throughput_mbps":
+            self._state = (
+                round(float(coordinator_data["downlink_throughput_bps"])/1000000), 2)
+            self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
 
-        elif self._kind == "starlink_uplink_throughput_bps":
-            self._state = float(coordinator_data["uplink_throughput_bps"])
-            self._unit_of_measure = DATA_RATE_BITS_PER_SECOND
+        elif self._kind == "starlink_uplink_throughput_mbps":
+            self._state = round((
+                float(coordinator_data["uplink_throughput_bps"])/1000000), 2)
+            self._unit_of_measure = DATA_RATE_MEGABITS_PER_SECOND
         elif self._kind == "starlink_pop_ping_drop_rate":
-            self._state = (float(coordinator_data["pop_ping_drop_rate"])*100)
+            self._state = round(
+                (float(coordinator_data["pop_ping_drop_rate"])*100), 2)
             self._unit_of_measure = PERCENTAGE
         elif self._kind == "starlink_pop_ping_latency_ms":
-            self._state = float(coordinator_data["pop_ping_latency_ms"])
+            self._state = round(float(coordinator_data["pop_ping_latency_ms"]))
             self._unit_of_measure = TIME_MILLISECONDS
         elif self._kind == "starlink_uptime":
             self._state = int(coordinator_data["uptime"])
