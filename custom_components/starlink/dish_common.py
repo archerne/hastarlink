@@ -16,6 +16,7 @@ from datetime import timezone
 import logging
 import re
 import time
+from typing import List
 
 import grpc
 
@@ -26,13 +27,15 @@ class DishCommon:
 
     def __init__(self):
         pass
+
     BRACKETS_RE = re.compile(r"([^[]*)(\[((\d+),|)(\d*)\]|)$")
     LOOP_TIME_DEFAULT = 0
-    STATUS_MODES = ["status", "obstruction_detail", "alert_detail"]
-    HISTORY_STATS_MODES = [
+    STATUS_MODES: List[str] = [
+        "status", "obstruction_detail", "alert_detail", "location"]
+    HISTORY_STATS_MODES: List[str] = [
         "ping_drop", "ping_run_length", "ping_latency", "ping_loaded_latency", "usage"
     ]
-    UNGROUPED_MODES = []
+    UNGROUPED_MODES: List[str] = []
 
     def create_arg_parser(self, output_description, bulk_history=True):
         """Create an argparse parser and add the common command line options."""
@@ -131,7 +134,11 @@ class DishCommon:
                 "Poll loops arg must be 2 or greater to be meaningful")
 
         # for convenience, set flags for whether any mode in a group is selected
-        opts.satus_mode = bool(set(self.STATUS_MODES).intersection(opts.mode))
+        status_set = set(self.STATUS_MODES)
+        opts.status_mode = bool(status_set.intersection(opts.mode))
+        status_set.remove("location")
+        # special group for any status mode other than location
+        opts.pure_status_mode = bool(status_set.intersection(opts.mode))
         opts.history_stats_mode = bool(
             set(self.HISTORY_STATS_MODES).intersection(opts.mode))
         opts.bulk_mode = "bulk_history" in opts.mode
@@ -175,6 +182,7 @@ class DishCommon:
             self.poll_count = 0
             self.accum_history = None
             self.first_poll = True
+            self.warn_once_location = True
 
         def shutdown(self):
             self.context.close()
@@ -258,39 +266,51 @@ class DishCommon:
                              int(start) if start else 0)
 
     def get_status_data(self, opts, gstate, add_item, add_sequence):
-        if opts.satus_mode:
+        if opts.status_mode:
             timestamp = int(time.time())
-            try:
-                groups = starlink_grpc.status_data(
-                    context=gstate.context)
-                status_data, obstruct_detail, alert_detail = groups[0:3]
-            except starlink_grpc.GrpcError as e:
-                if "status" in opts.mode:
-                    if opts.need_id and gstate.dish_id is None:
-                        self.conn_error(
-                            opts, "Dish unreachable and ID unknown, so not recording state")
-                        return 1, None
-                    if opts.verbose:
-                        print("Dish unreachable")
-                    add_item("state", "DISH_UNREACHABLE", "status")
-                    return 0, timestamp
-                self.conn_error(opts, "Failure getting status: %s", str(e))
-                return 1, None
-            if opts.need_id:
-                gstate.dish_id = status_data["id"]
-                del status_data["id"]
             add_data = self.add_data_numeric if opts.numeric else self.add_data_normal
-            if "status" in opts.mode:
-                add_data(status_data, "status", add_item, add_sequence)
-            if "obstruction_detail" in opts.mode:
-                add_data(obstruct_detail, "status", add_item, add_sequence)
-            if "alert_detail" in opts.mode:
-                add_data(alert_detail, "status", add_item, add_sequence)
+            if opts.pure_status_mode or opts.need_id and gstate.dish_id is None:
+                try:
+                    groups = starlink_grpc.status_data(context=gstate.context)
+                    status_data, obstruct_detail, alert_detail = groups[0:3]
+                except starlink_grpc.GrpcError as e:
+                    if "status" in opts.mode:
+                        if opts.need_id and gstate.dish_id is None:
+                            self.conn_error(
+                                opts, "Dish unreachable and ID unknown, so not recording state")
+                            return 1, None
+                        if opts.verbose:
+                            print("Dish unreachable")
+                        add_item("state", "DISH_UNREACHABLE", "status")
+                        return 0, timestamp
+                    self.conn_error(opts, "Failure getting status: %s", str(e))
+                    return 1, None
+                if opts.need_id:
+                    gstate.dish_id = status_data["id"]
+                    del status_data["id"]
+                if "status" in opts.mode:
+                    add_data(status_data, "status", add_item, add_sequence)
+                if "obstruction_detail" in opts.mode:
+                    add_data(obstruct_detail, "status", add_item, add_sequence)
+                if "alert_detail" in opts.mode:
+                    add_data(alert_detail, "status", add_item, add_sequence)
+            if "location" in opts.mode:
+                try:
+                    location = starlink_grpc.location_data(
+                        context=gstate.context)
+                except starlink_grpc.GrpcError as e:
+                    self.conn_error(
+                        opts, "Failure getting location: %s", str(e))
+                    return 1, None
+                if location["latitude"] is None and gstate.warn_once_location:
+                    logging.warning(
+                        "Location data not enabled. See README for more details.")
+                    gstate.warn_once_location = False
+                add_data(location, "status", add_item, add_sequence)
             return 0, timestamp
         elif opts.need_id and gstate.dish_id is None:
             try:
-                gstate.dish_id = starlink_grpc.get_id(
-                    context=gstate.context)
+                gstate.dish_id = starlink_grpc.get_id(context=gstate.context)
             except starlink_grpc.GrpcError as e:
                 self.conn_error(opts, "Failure getting dish ID: %s", str(e))
                 return 1, None
@@ -306,8 +326,7 @@ class DishCommon:
         else:
             try:
                 timestamp = int(time.time())
-                history = starlink_grpc.get_history(
-                    context=gstate.context)
+                history = starlink_grpc.get_history(context=gstate.context)
                 gstate.timestamp_stats = timestamp
             except grpc.RpcError as e:
                 self.conn_error(opts, "Failure getting history: %s",

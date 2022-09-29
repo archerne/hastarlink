@@ -6,7 +6,7 @@ import datetime
 
 from homeassistant.util.dt import as_local, utc_from_timestamp
 from homeassistant.components.sensor import ENTITY_ID_FORMAT, DEVICE_CLASS_TIMESTAMP
-from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TIME_MILLISECONDS, TIME_SECONDS, ATTR_NAME
+from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TIME_MILLISECONDS, TIME_SECONDS, ATTR_NAME, CONF_LATITUDE, CONF_LONGITUDE, CONF_ELEVATION
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -95,6 +95,36 @@ async def async_setup_entry(hass, entry, async_add_entities):
             "starlinkstats",
         )
     )
+
+    sensors.append(
+        StarlinkSensor(
+            coordinator,
+            "Dish Latitude",
+            "starlink_latitude",
+            "mdi:information-outline",
+            "starlinkstats",
+        )
+    )
+
+    sensors.append(
+        StarlinkSensor(
+            coordinator,
+            "Dish Longitude",
+            "starlink_longitude",
+            "mdi:information-outline",
+            "starlinkstats",
+        )
+    )
+
+    sensors.append(
+        StarlinkSensor(
+            coordinator,
+            "Dish Altitude",
+            "starlink_altitude",
+            "mdi:information-outline",
+            "starlinkstats",
+        )
+    )
     async_add_entities(sensors)
 
 
@@ -136,6 +166,15 @@ class StarlinkSensor(CoordinatorEntity):
 
         elif self._kind == "starlink_uptime":
             self._unit_of_measure = TIME_SECONDS
+
+        elif self._kind == "starlink_latitude":
+            self._unit_of_measure = CONF_LATITUDE
+
+        elif self._kind == "starlink_longitude":
+            self._unit_of_measure = CONF_LONGITUDE
+
+        elif self._kind == "starlink_altitude":
+            self._unit_of_measure = CONF_ELEVATION
 
     @property
     def unique_id(self):
@@ -208,6 +247,18 @@ class StarlinkSensor(CoordinatorEntity):
         elif self._kind == "starlink_uptime":
             self._state = int(coordinator_data["uptime"])
             self._unit_of_measure = TIME_SECONDS
+        elif self._kind == "starlink_latitude":
+            self._state = round(
+                float(coordinator_data["latitude"]), 4)
+            self._unit_of_measure = CONF_LATITUDE
+        elif self._kind == "starlink_longitude":
+            self._state = round(
+                float(coordinator_data["longitude"]), 4)
+            self._unit_of_measure = CONF_LONGITUDE
+        elif self._kind == "starlink_altitude":
+            self._state = round(
+                float(coordinator_data["altitude"]), 4)
+            self._unit_of_measure = CONF_ELEVATION
 
         return self._state
 

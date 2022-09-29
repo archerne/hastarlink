@@ -94,14 +94,14 @@ class DishGrpcText:
 
         opts = self._dish_common.run_arg_parser(parser)
 
-        if (opts.history_stats_mode or opts.satus_mode) and opts.bulk_mode and not opts.verbose:
+        if (opts.history_stats_mode or opts.status_mode) and opts.bulk_mode and not opts.verbose:
             parser.error(
                 "bulk_history cannot be combined with other modes for CSV output")
 
         # Technically possible, but a pain to implement, so just disallow it. User
         # probably doesn't realize how weird it would be, anyway, given that stats
         # data reports at a different rate from status data in this case.
-        if opts.history_stats_mode and opts.satus_mode and not opts.verbose and opts.poll_loops > 1:
+        if opts.history_stats_mode and opts.status_mode and not opts.verbose and opts.poll_loops > 1:
             parser.error("usage of --poll-loops with history stats modes cannot be mixed with status "
                          "modes for CSV output")
 
@@ -132,21 +132,24 @@ class DishGrpcText:
                 else:
                     header.append(name)
 
-        if opts.satus_mode:
-            context = self.starlink_grpc.ChannelContext(target=opts.target)
-            try:
-                name_groups = self.starlink_grpc.status_field_names(
-                    context=context)
-            except self.starlink_grpc.GrpcError as e:
-                self._dish_common.conn_error(
-                    opts, "Failure reflecting status field names: %s", str(e))
-                return 1
-            if "status" in opts.mode:
-                header_add(name_groups[0])
-            if "obstruction_detail" in opts.mode:
-                header_add(name_groups[1])
-            if "alert_detail" in opts.mode:
-                header_add(name_groups[2])
+        if opts.status_mode:
+            if opts.pure_status_mode:
+                context = starlink_grpc.ChannelContext(target=opts.target)
+                try:
+                    name_groups = starlink_grpc.status_field_names(
+                        context=context)
+                except starlink_grpc.GrpcError as e:
+                    self._dish_common.conn_error(
+                        opts, "Failure reflecting status field names: %s", str(e))
+                    return 1
+                if "status" in opts.mode:
+                    header_add(name_groups[0])
+                if "obstruction_detail" in opts.mode:
+                    header_add(name_groups[1])
+                if "alert_detail" in opts.mode:
+                    header_add(name_groups[2])
+            if "location" in opts.mode:
+                header_add(starlink_grpc.location_field_names())
 
         if opts.bulk_mode:
             general, bulk = self.starlink_grpc.history_bulk_field_names()

@@ -139,8 +139,9 @@ class StarlinkClass:
         obj.print_header = False
         obj.out_file = '-'
         obj.skip_query = False
-        obj.mode = ["status", "alert_detail"]
-        obj.satus_mode = True
+        obj.mode = ["status", "alert_detail", "location"]
+        obj.status_mode = True
+        obj.pure_status_mode = True
         obj.history_stats_mode = False
         obj.bulk_mode = False
         obj.bulk_samples = -1

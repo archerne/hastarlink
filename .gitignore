@@ -1,1 +1,4 @@
 .venv/
+sample.txt
+custom_components/starlink/test.py
+custom_components/starlink/__pycache__/
