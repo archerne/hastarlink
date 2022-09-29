@@ -3,29 +3,31 @@
 This integration will provide sensors for Starlink Statistics and Alerts information from the Starlink Dish.
 Please make sure that you can get to <a target="_blank" href="http://192.168.100.1/">this site<a> (http://192.168.100.1) on your home assistant instance.
 
-Sensors:
+####  Stat Sensors:
 - Downlink Throughput
-- Install Pending
-- Is Heating
-- Mast Not Near Vertical
-- Motors Stuck
-- Obstructed
 - Ping Drop Rate
 - Ping Latency
-- Roaming
-- Slow Ethernet Speeds
 - Software Version
 - State
-- Thermal Shutdown
-- Thermal Throttle
-- Unexpected Location
 - Uplink Throughput
 - Uptime
 - Latitude
 - Longitude
 - Altitude
 
-Buttons:
+####  Alert Sensors:
+- Install Pending
+- Is Heating
+- Mast Not Near Vertical
+- Motors Stuck
+- Obstructed
+- Roaming
+- Slow Ethernet Speeds
+- Thermal Shutdown
+- Thermal Throttle
+- Unexpected Location
+
+####  Buttons:
 - Reboot
 - Stow
 - Unstow
