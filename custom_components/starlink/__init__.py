@@ -9,13 +9,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-
+from homeassistant.const import Platform
 from .const import COORDINATOR, DOMAIN, SPACEX_API
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["binary_sensor", "sensor"]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -116,6 +116,30 @@ class StarlinkUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.info("Starlink API: %s", error)
             raise UpdateFailed from error
 
+    async def reboot_job(self):
+        try:
+            _LOGGER.debug("Rebooting dish.")
+            await self.api.reboot_job()
+        except Exception as error:
+            _LOGGER.info("Starlink API: %s", error)
+            raise UpdateFailed from error
+
+    async def stow_job(self):
+        try:
+            _LOGGER.debug("Rebooting dish.")
+            await self.api.stow_job()
+        except Exception as error:
+            _LOGGER.info("Starlink API: %s", error)
+            raise UpdateFailed from error
+
+    async def unstow_job(self):
+        try:
+            _LOGGER.debug("Rebooting dish.")
+            await self.api.unstow_job()
+        except Exception as error:
+            _LOGGER.info("Starlink API: %s", error)
+            raise UpdateFailed from error
+
 
 class StarlinkClass:
 
@@ -156,4 +180,26 @@ class StarlinkClass:
                 #print(f"Key: '{keypair[0].strip()}' Value: '{keypair[1].strip()}'")
                 responseObj[keypair[0].strip()] = keypair[1].strip()
         # print(response)
+        if responseObj["latitude"] == '':
+            responseObj["latitude"] = 0
+        if responseObj["longitude"] == '':
+            responseObj["longitude"] = 0
+        if responseObj["altitude"] == '':
+            responseObj["altitude"] = 0
+
         return responseObj
+
+    async def reboot_job(self):
+        import starlink_grpc
+        starlink_grpc.reboot()
+        return
+
+    async def stow_job(self):
+        import starlink_grpc
+        starlink_grpc.set_stow_state(unstow=False)
+        return
+
+    async def unstow_job(self):
+        import starlink_grpc
+        starlink_grpc.set_stow_state(unstow=True)
+        return

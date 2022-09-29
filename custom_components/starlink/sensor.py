@@ -9,9 +9,7 @@ from homeassistant.components.sensor import ENTITY_ID_FORMAT, DEVICE_CLASS_TIMES
 from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TIME_MILLISECONDS, TIME_SECONDS, ATTR_NAME, CONF_LATITUDE, CONF_LONGITUDE, CONF_ELEVATION
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
+    CoordinatorEntity
 )
 from . import StarlinkUpdateCoordinator
 

@@ -303,8 +303,8 @@ class DishCommon:
                         opts, "Failure getting location: %s", str(e))
                     return 1, None
                 if location["latitude"] is None and gstate.warn_once_location:
-                    logging.warning(
-                        "Location data not enabled. See README for more details.")
+                    # logging.warning(
+                    #    "Location data not enabled. See README for more details.")
                     gstate.warn_once_location = False
                 add_data(location, "status", add_item, add_sequence)
             return 0, timestamp
