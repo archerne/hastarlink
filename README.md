@@ -26,6 +26,7 @@ Sensors:
 - Latitude
 - Longitude
 - Altitude
+
 Buttons:
 - Reboot
 - Stow
