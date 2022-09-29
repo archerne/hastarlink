@@ -26,6 +26,10 @@ Sensors:
 - Latitude
 - Longitude
 - Altitude
+Buttons:
+- Reboot
+- Stow
+- Unstow
 
 
 ## (Optional) Enable Location
@@ -45,10 +49,6 @@ Search for Starlink and you will see the integration available.
 Click add, confirm you want to install
 
 <a target="_blank" href="https://www.buymeacoffee.com/archerne"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy me a coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;"></a>
-
-## Future
-
-Add services to be able to restart and stow the dish. The script is written, it will just need to me ported to work for HA
 
 ## Thanks
 A large thanks to Sparky8512 for providing the kick start to all of this, this uses modified versions of scripts from https://github.com/sparky8512/starlink-grpc-tools
