@@ -147,44 +147,18 @@ class StarlinkClass:
         pass
 
     async def get(self):
-        from .dish_grpc_text import DishGrpcText
-        _dish_grpc_text = DishGrpcText()
-
-        class Object(object):
-            pass
-        obj = Object()
-        obj.target = None
-        obj.numeric = False
-        obj.loop_interval = 0.0
-        obj.verbose = False,
-        obj.samples = -1
-        obj.poll_loops = 1
-        obj.no_counter = False
-        obj.print_header = False
-        obj.out_file = '-'
-        obj.skip_query = False
-        obj.mode = ["status", "alert_detail", "location"]
-        obj.status_mode = True
-        obj.pure_status_mode = True
-        obj.history_stats_mode = False
-        obj.bulk_mode = False
-        obj.bulk_samples = -1
-        obj.no_stdout_errors = True
-        obj.need_id = False
-        response = _dish_grpc_text.main(obj)
+        import starlink_grpc
+        status = starlink_grpc.status_data()
+        location = starlink_grpc.location_data()
         responseObj = {}
-        for line in response:
-            atts = line.split(",")
-            for x in atts:
-                keypair = x.split(":")
-                #print(f"Key: '{keypair[0].strip()}' Value: '{keypair[1].strip()}'")
-                responseObj[keypair[0].strip()] = keypair[1].strip()
-        # print(response)
-        if responseObj["latitude"] == '':
+        for line in status:
+            responseObj =responseObj | line
+        responseObj =responseObj | location
+        if responseObj["latitude"] is None or responseObj["latitude"] == '':
             responseObj["latitude"] = 0
-        if responseObj["longitude"] == '':
+        if responseObj["longitude"] is None or responseObj["longitude"] == '':
             responseObj["longitude"] = 0
-        if responseObj["altitude"] == '':
+        if responseObj["altitude"] is None or responseObj["altitude"] == '':
             responseObj["altitude"] = 0
 
         return responseObj
