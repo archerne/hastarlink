@@ -156,7 +156,7 @@ class StarlinkClass:
         obj.target = None
         obj.numeric = False
         obj.loop_interval = 0.0
-        obj.verbose = False,
+        obj.verbose = True
         obj.samples = -1
         obj.poll_loops = 1
         obj.no_counter = False

@@ -243,17 +243,17 @@ class DishGrpcText:
                                                             add_bulk=cb_add_bulk,
                                                             flush_history=shutdown)
 
-        if opts.verbose:
-            if csv_data:
-                print("\n".join(csv_data), file=print_file)
-                if opts.loop_interval > 0.0:
-                    print(file=print_file)
-        else:
-            if csv_data:
-                timestamp = status_ts if status_ts is not None else hist_ts
-                csv_data.insert(0, datetime.utcfromtimestamp(
-                    timestamp).isoformat())
-                print(",".join(csv_data), file=print_file)
+        #if opts.verbose:
+        #    if csv_data:
+        #        print("\n".join(csv_data), file=print_file)
+        #        if opts.loop_interval > 0.0:
+        #            print(file=print_file)
+        #else:
+        #    if csv_data:
+        #        timestamp = status_ts if status_ts is not None else hist_ts
+        #        csv_data.insert(0, datetime.utcfromtimestamp(
+        #            timestamp).isoformat())
+        #        print(",".join(csv_data), file=print_file)
 
         return ",".join(csv_data)
 
