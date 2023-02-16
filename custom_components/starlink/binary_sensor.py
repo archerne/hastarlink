@@ -191,25 +191,25 @@ class StarlinkBinarySensor(BinarySensorEntity):
         starlink_data = self.coordinator.data
 
         if self._kind == "starlink_currently_obstructed":
-            return starlink_data["currently_obstructed"] == 'True'
+            return starlink_data["currently_obstructed"] == True
         elif self._kind == "starlink_alert_motors_stuck":
-            return starlink_data["alert_motors_stuck"] == 'True'
+            return starlink_data["alert_motors_stuck"] == True
         elif self._kind == "starlink_alert_thermal_throttle":
-            return starlink_data["alert_thermal_throttle"] == 'True'
+            return starlink_data["alert_thermal_throttle"] == True
         elif self._kind == "starlink_alert_thermal_shutdown":
-            return starlink_data["alert_thermal_shutdown"] == 'True'
+            return starlink_data["alert_thermal_shutdown"] == True
         elif self._kind == "starlink_alert_mast_not_near_vertical":
-            return starlink_data["alert_mast_not_near_vertical"] == 'True'
+            return starlink_data["alert_mast_not_near_vertical"] == True
         elif self._kind == "starlink_alert_unexpected_location":
-            return starlink_data["alert_unexpected_location"] == 'True'
+            return starlink_data["alert_unexpected_location"] == True
         elif self._kind == "starlink_alert_slow_ethernet_speeds":
-            return starlink_data["alert_slow_ethernet_speeds"] == 'True'
+            return starlink_data["alert_slow_ethernet_speeds"] == True
         elif self._kind == "starlink_alert_roaming":
-            return starlink_data["alert_roaming"] == 'True'
+            return starlink_data["alert_roaming"] == True
         elif self._kind == "starlink_alert_install_pending":
-            return starlink_data["alert_install_pending"] == 'True'
+            return starlink_data["alert_install_pending"] == True
         elif self._kind == "starlink_alert_is_heating":
-            return starlink_data["alert_is_heating"] == 'True'
+            return starlink_data["alert_is_heating"] == True
 
     async def async_update(self):
         """Update Starlink Binary Sensor Entity."""
